@@ -37,7 +37,7 @@ class ImageProjection(Node):
             integer_range=[
                 IntegerRange(
                     from_value=0,
-                    to_value=120,
+                    to_value=320,
                     step=1)]
         )
         parameter_descriptor_bottom = ParameterDescriptor(
@@ -45,7 +45,7 @@ class ImageProjection(Node):
             integer_range=[
                 IntegerRange(
                     from_value=0,
-                    to_value=320,
+                    to_value=500,
                     step=1)]
         )
 
@@ -157,29 +157,29 @@ class ImageProjection(Node):
             # draw lines to help setting homography variables
             cv_image_calib = cv2.line(
                 cv_image_calib,
-                (320 - top_x, 400 - top_y),
-                (320 + top_x, 400 - top_y),
+                (320 - top_x, 300 - top_y),
+                (320 + top_x, 300 - top_y),
                 (0, 0, 255),
                 1
             )
             cv_image_calib = cv2.line(
                 cv_image_calib,
-                (320 - bottom_x, 360 + bottom_y),
-                (320 + bottom_x, 360 + bottom_y),
+                (320 - bottom_x, 400 + bottom_y),
+                (320 + bottom_x, 400 + bottom_y),
                 (0, 0, 255),
                 1
             )
             cv_image_calib = cv2.line(
                 cv_image_calib,
-                (320 + bottom_x, 360 + bottom_y),
-                (320 + top_x, 400 - top_y),
+                (320 + bottom_x, 400 + bottom_y),
+                (320 + top_x, 300 - top_y),
                 (0, 0, 255),
                 1
             )
             cv_image_calib = cv2.line(
                 cv_image_calib,
-                (320 - bottom_x, 360 + bottom_y),
-                (320 - top_x, 400 - top_y),
+                (320 - bottom_x, 400 + bottom_y),
+                (320 - top_x, 300 - top_y),
                 (0, 0, 255),
                 1
             )
@@ -198,10 +198,10 @@ class ImageProjection(Node):
         # homography transform process
         # selecting 4 points from the original image
         pts_src = np.array([
-            [320 - top_x, 400 - top_y],
-            [320 + top_x, 400 - top_y],
-            [320 + bottom_x, 360 + bottom_y],
-            [320 - bottom_x, 360 + bottom_y]
+            [320 - top_x, 300 - top_y],
+            [320 + top_x, 300 - top_y],
+            [320 + bottom_x, 400 + bottom_y],
+            [320 - bottom_x, 400 + bottom_y]
         ])
 
         # selecting 4 points from image that will be transformed
