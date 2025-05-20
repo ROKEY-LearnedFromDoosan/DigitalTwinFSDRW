@@ -6,14 +6,14 @@
         white:
           hue_h: 179
           hue_l: 0
-          lightness_h: 255
-          lightness_l: 105
-          saturation_h: 70
-          saturation_l: 0
-        yellow:
-          hue_h: 127
-          hue_l: 10
-          lightness_h: 255
-          lightness_l: 95
+          lightness_h: 27
+          lightness_l: 0
           saturation_h: 255
-          saturation_l: 70
+          saturation_l: 159
+        yellow:
+          hue_h: 179
+          hue_l: 0
+          lightness_h: 142
+          lightness_l: 53
+          saturation_h: 255
+          saturation_l: 206

@@ -4,7 +4,7 @@ camera:
     ros__parameters:
       camera:
         extrinsic_camera_calibration:
-          top_x: 67
-          top_y: 70
-          bottom_x: 470
-          bottom_y: 0
+          top_x: 507
+          top_y: 291
+          bottom_x: 640
+          bottom_y: 234

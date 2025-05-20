@@ -37,7 +37,7 @@ class ImageProjection(Node):
             integer_range=[
                 IntegerRange(
                     from_value=0,
-                    to_value=320,
+                    to_value=620,
                     step=1)]
         )
         parameter_descriptor_bottom = ParameterDescriptor(
@@ -45,17 +45,17 @@ class ImageProjection(Node):
             integer_range=[
                 IntegerRange(
                     from_value=0,
-                    to_value=500,
+                    to_value=640,
                     step=1)]
         )
 
         self.declare_parameters(
             namespace='',
             parameters=[
-                ('camera.extrinsic_camera_calibration.top_x', 72, parameter_descriptor_top),
-                ('camera.extrinsic_camera_calibration.top_y', 4, parameter_descriptor_top),
-                ('camera.extrinsic_camera_calibration.bottom_x', 259, parameter_descriptor_bottom),
-                ('camera.extrinsic_camera_calibration.bottom_y', 159, parameter_descriptor_bottom),
+                ('camera.extrinsic_camera_calibration.top_x', 507, parameter_descriptor_top),
+                ('camera.extrinsic_camera_calibration.top_y', 291, parameter_descriptor_top),
+                ('camera.extrinsic_camera_calibration.bottom_x', 640, parameter_descriptor_bottom),
+                ('camera.extrinsic_camera_calibration.bottom_y', 234, parameter_descriptor_bottom),
                 ('is_extrinsic_camera_calibration_mode', False)
             ]
         )
@@ -157,29 +157,29 @@ class ImageProjection(Node):
             # draw lines to help setting homography variables
             cv_image_calib = cv2.line(
                 cv_image_calib,
-                (320 - top_x, 300 - top_y),
-                (320 + top_x, 300 - top_y),
+                (640 - top_x, 400 - top_y),
+                (640 + top_x, 400 - top_y),
                 (0, 0, 255),
                 1
             )
             cv_image_calib = cv2.line(
                 cv_image_calib,
-                (320 - bottom_x, 400 + bottom_y),
-                (320 + bottom_x, 400 + bottom_y),
+                (640 - bottom_x, 360 + bottom_y),
+                (640 + bottom_x, 360 + bottom_y),
                 (0, 0, 255),
                 1
             )
             cv_image_calib = cv2.line(
                 cv_image_calib,
-                (320 + bottom_x, 400 + bottom_y),
-                (320 + top_x, 300 - top_y),
+                (640 + bottom_x, 360 + bottom_y),
+                (640 + top_x, 400 - top_y),
                 (0, 0, 255),
                 1
             )
             cv_image_calib = cv2.line(
                 cv_image_calib,
-                (320 - bottom_x, 400 + bottom_y),
-                (320 - top_x, 300 - top_y),
+                (640 - bottom_x, 360 + bottom_y),
+                (640 - top_x, 400 - top_y),
                 (0, 0, 255),
                 1
             )
@@ -198,10 +198,10 @@ class ImageProjection(Node):
         # homography transform process
         # selecting 4 points from the original image
         pts_src = np.array([
-            [320 - top_x, 300 - top_y],
-            [320 + top_x, 300 - top_y],
-            [320 + bottom_x, 400 + bottom_y],
-            [320 - bottom_x, 400 + bottom_y]
+            [640 - top_x, 400 - top_y],
+            [640 + top_x, 400 - top_y],
+            [640 + bottom_x, 360 + bottom_y],
+            [640 - bottom_x, 360 + bottom_y]
         ])
 
         # selecting 4 points from image that will be transformed

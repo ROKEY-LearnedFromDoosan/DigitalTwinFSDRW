@@ -58,25 +58,25 @@ class DetectLane(Node):
                     parameter_descriptor_hue),
                 ('detect.lane.white.hue_h', 179,
                     parameter_descriptor_hue),
-                ('detect.lane.white.saturation_l', 0,
+                ('detect.lane.white.saturation_l', 255,
                     parameter_descriptor_saturation_lightness),
-                ('detect.lane.white.saturation_h', 70,
+                ('detect.lane.white.saturation_h', 159,
                     parameter_descriptor_saturation_lightness),
-                ('detect.lane.white.lightness_l', 105,
+                ('detect.lane.white.lightness_l', 0,
                     parameter_descriptor_saturation_lightness),
-                ('detect.lane.white.lightness_h', 255,
+                ('detect.lane.white.lightness_h', 27,
                     parameter_descriptor_saturation_lightness),
-                ('detect.lane.yellow.hue_l', 10,
+                ('detect.lane.yellow.hue_l', 0,
                     parameter_descriptor_hue),
-                ('detect.lane.yellow.hue_h', 127,
+                ('detect.lane.yellow.hue_h', 179,
                     parameter_descriptor_hue),
-                ('detect.lane.yellow.saturation_l', 70,
+                ('detect.lane.yellow.saturation_l', 206,
                     parameter_descriptor_saturation_lightness),
                 ('detect.lane.yellow.saturation_h', 255,
                     parameter_descriptor_saturation_lightness),
-                ('detect.lane.yellow.lightness_l', 95,
+                ('detect.lane.yellow.lightness_l', 53,
                     parameter_descriptor_saturation_lightness),
-                ('detect.lane.yellow.lightness_h', 255,
+                ('detect.lane.yellow.lightness_h', 142,
                     parameter_descriptor_saturation_lightness),
                 ('is_detection_calibration_mode', False)
             ]
@@ -584,7 +584,7 @@ class DetectLane(Node):
 
             lane_state.data = 0
 
-            pass
+            return
 
         self.pub_lane_state.publish(lane_state)
         self.get_logger().info(f'Lane state: {lane_state.data}')

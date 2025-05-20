@@ -47,7 +47,7 @@ def generate_launch_description():
 
     # aruco
     aruco_launch = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource([launch_dir1, 'aruco_yolo.launch.py'])
+        PythonLaunchDescriptionSource([launch_dir1, '/aruco_yolo_one.launch.py'])
     )
     ld.add_action(aruco_launch)
 
@@ -64,7 +64,7 @@ def generate_launch_description():
     ld.add_action(move_group_launch)
 
     arm_control_node = Node(
-        package="turtlebot_moveit"
+        package="turtlebot_moveit",
         executable="turtlebot_arm_controller"
     )
     ld.add_action(arm_control_node)

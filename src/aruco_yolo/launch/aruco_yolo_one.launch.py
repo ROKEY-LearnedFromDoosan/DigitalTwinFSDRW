@@ -5,8 +5,7 @@ def generate_launch_description():
     return LaunchDescription([
         Node(
             package='aruco_yolo',
-            executable='raw_image_with_yaml',
-            name='raw_image_with_yaml',
+            executable='compressed_image_pub',
+            name='compressed_image_pub',
             output='screen'
-        )
-    ])
+        )])
