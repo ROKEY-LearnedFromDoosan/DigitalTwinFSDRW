@@ -27,22 +27,28 @@ class ControlLane(Node):
         self.last_error = 0
 
     def callback_follow_lane(self, desired_center):
-
         center = desired_center.data
         error = center - 500
 
-        Kp = 0.0025
-        Kd = 0.0007
+        Kp = 0.0032
+        Kd = 0.0006
 
         angular_z = Kp * error + Kd * (error - self.last_error)
         self.last_error = error
 
+        max_speed = 0.1
         twist = Twist()
-        # Linear velocity: adjust speed based on error (maximum 0.05 limit)
-        twist.linear.x = min(30 * (max(1 - abs(error) / 500, 0) ** 2.2), 0.05)
-        twist.angular.z = -max(angular_z, -2.0) if angular_z < 0 else -min(angular_z, 2.0)
+        twist.linear.x = min(30 * (max(1 - abs(error) / 500, 0) ** 2.2), max_speed)
+
+        limit = 3.0
+        twist.angular.z = -max(angular_z, -limit) if angular_z < 0 else -min(angular_z, limit)
+
+        # 속도와 조향 연동 (속도 빠를수록 조향 감도 줄임)
+        twist.angular.z *= max(1 - twist.linear.x / max_speed, 0.5)
+
         self.pub_cmd_vel.publish(twist)
         self.get_logger().info(f'Published to /cmd_vel: {twist.linear.x:.3f},{twist.angular.z:.3f}')
+
 
     def shut_down(self):
         self.get_logger().info('Shutting down. cmd_vel will be 0')
