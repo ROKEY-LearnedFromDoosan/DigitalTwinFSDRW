@@ -28,7 +28,8 @@ setup(
             'aruco_move = aruco_yolo.aruco_move:main',
             'compressed_image_pub = aruco_yolo.compressed_image_pub:main',
             'yolo_detector = aruco_yolo.yolo_detector:main',
-            'raw_image_with_yaml = aruco_yolo.raw_image_with_yaml:main'
+            'raw_image_with_yaml = aruco_yolo.raw_image_with_yaml:main',
+            'pick_and_place = aruco_yolo.pick_and_place:main'
         ],
     },
     package_data={
