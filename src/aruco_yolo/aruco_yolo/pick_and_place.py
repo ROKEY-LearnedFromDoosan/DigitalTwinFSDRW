@@ -16,9 +16,12 @@ from rclpy.node import Node
 from aruco_msgs.msg import MarkerArray, Marker
 from geometry_msgs.msg import Twist
 from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
+from rclpy.action import ActionClient
+from control_msgs.action import GripperCommand
 import getkey
 from std_msgs.msg import Header
 from sensor_msgs.msg import JointState
+import time
 
 
 class ArucoMarkerListener(Node):
@@ -30,9 +33,9 @@ class ArucoMarkerListener(Node):
             'detected_markers',
             self.listener_callback,
             10)
-        self.subscription  # prevent unused variable warning
+        # self.subscription  # prevent unused variable warning
         self.cmd_vel_publisher = self.create_publisher(Twist, '/cmd_vel', 2)
-
+        self.gripper_action_client = ActionClient(self, GripperCommand, 'gripper_controller/gripper_cmd')
         self.twist = Twist()
         self.finish_move = False
 
@@ -69,12 +72,17 @@ class ArucoMarkerListener(Node):
                 print(f'joint4 : {position}')
 
     def listener_callback(self, msg):
+        self.get_logger().info('listenenenenene')
+        # self.aruco_distance = msg.
         self.target_marker_id = 0                      # Change this to the desired marker ID
+        self.get_logger().info(msg)
+        self.get_logger().info(msg.markers)
+        self.get_logger().info(msg.markers[0])
+
         for marker in msg.markers:
             if self.marker.id == self.target_marker_id:
                 self.get_logger().debug(f'Marker ID: {marker.id}, PositionZ: {marker.pose.pose.position.z}')
                 print(f'z:[{self.marker.pose.pose.position.z}] x:[{self.marker.pose.pose.position.x}] ')
-                # if marker.pose.pose.position.z > 0.30:
                 if self.marker.pose.pose.position.z > 0.41:
                     self.publish_cmd_vel(0.10)
                 elif self.marker.pose.pose.position.z > 0.31:
@@ -90,6 +98,17 @@ class ArucoMarkerListener(Node):
         self.twist.linear.x = linear_x
         self.twist.angular.z = 0.0
         self.cmd_vel_publisher.publish(self.twist)            
+
+    def send_gripper_goal(self, position):  
+        goal = GripperCommand.Goal()
+        goal.command.position = position
+        goal.command.max_effort = -1.0
+
+        if not self.gripper_action_client.wait_for_server(timeout_sec=1.0):
+            self.get_logger().error("Gripper action server not available!")
+            return
+            
+        self.gripper_action_client.send_goal_async(goal)
 
 def main(args=None):
     rclpy.init(args=args)
@@ -109,7 +128,8 @@ def main(args=None):
     point.time_from_start.sec = 0
     point.time_from_start.nanosec = 500
 
-    point.positions = [0.0, -1.052, 1.106, 0.029]
+    # point.positions = [0.0, -1.052, 1.106, 0.029]
+    point.positions = [0.0, -1.1519, 0.0524, 2.0071]
 
     print("point",point.positions)
     trajectory_msg.points = [point]
@@ -122,9 +142,10 @@ def main(args=None):
         key_value = getkey.getkey()
         if key_value == '1':          # cube home
             print(f"No. {key_value}")
-            point.positions = [0.0, -0.058, -0.258, 1.94]
+            point.positions = [0.0, -1.1519, 0.0524, 2.0071]
             print("point",point.positions)
             joint_pub.publish(trajectory_msg)
+            node.send_gripper_goal(0.015)
 
         elif key_value == '2':        # box home
             print(f"No. {key_value}")
@@ -173,36 +194,51 @@ def main(args=None):
         elif key_value == '9':        # distance and offset for marker
             print(f"No. {key_value}")
             rclpy.spin_once(node)
+        elif key_value == '-':
+            node.send_gripper_goal(-0.005)
+            print('close')
+        elif key_value == '=':
+            node.send_gripper_goal(0.015)
+            print('open')
 
         elif key_value == '0':
             print(f"No. {key_value}")
-
-            # 1️⃣ 물건 있는 위치로 이동
-            point.positions = [0.0, -0.058, -0.258, 1.94]
+            point.time_from_start.sec = 3
+            point.positions = [0.0, 1.0123, -0.8378, 1.2043]
             print("Move to object:", point.positions)
-            trajectory_msg.points = [point]
+            node.send_gripper_goal(0.015)
             joint_pub.publish(trajectory_msg)
-            rclpy.spin_once(node)  # 한 번 기다리기 (완료 보장용)
+            time.sleep(2.5)
 
-            # 2️⃣ 왼쪽으로 90도 회전 (joint1)
-            point.positions[0] = 1.57  # 약 90도 (rad)
-            print("Rotate 90 deg left:", point.positions)
+            point.positions = [0.0, 0.6807, -0.8378, 1.2043]
+            node.send_gripper_goal(-0.005)
+            print("Grabbed the object")
+            time.sleep(1.5)
+            print("Lift object:", point.positions)
             joint_pub.publish(trajectory_msg)
-            rclpy.spin_once(node)
+            time.sleep(1.5)
 
-            # 3️⃣ 물건 놓는 위치로 팔 이동
-            point.positions = [1.57, -1.052, 1.106, 0.029]
-            print("Move to place location:", point.positions)
-            trajectory_msg.points = [point]
+            point.positions = [1.0472, 0.6807, -0.8378, 1.2043]
+            print("Rotate to :", point.positions)
             joint_pub.publish(trajectory_msg)
-            rclpy.spin_once(node)
+            time.sleep(1.5)
 
-            # 4️⃣ 원래 위치로 복귀
-            point.positions = [0.0, -1.052, 1.106, 0.029]
-            print("Return to home:", point.positions)
-            trajectory_msg.points = [point]
+            point.positions = [1.0472, 1.0123, -0.8378, 1.2043]
+            print("Put object down :", point.positions)
             joint_pub.publish(trajectory_msg)
-            rclpy.spin_once(node)
+            time.sleep(2.5)
+            node.send_gripper_goal(0.015)
+            print("Let it go")
+            time.sleep(1.5)
+
+            point.positions = [1.0472, 0.6807, -0.8378, 1.2043]
+            print("Safe zone:", point.positions)
+            joint_pub.publish(trajectory_msg)
+            time.sleep(1.5)
+
+            point.positions = [0.0, -1.1519, 0.0524, 2.0071]
+            print("Initial position :", point.positions)
+            joint_pub.publish(trajectory_msg)
 
 
         elif key_value == 'q':

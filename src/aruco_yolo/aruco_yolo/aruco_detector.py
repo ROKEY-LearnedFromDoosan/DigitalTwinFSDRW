@@ -101,10 +101,10 @@ class ArucoMarkerDetector(Node):
         
         frame, detect_data = detect_markers(frame, self.camera_matrix, self.dist_coeffs, self.marker_size)
         if len(detect_data) == 0:
-            self.get_logger().debug("No markers detected")
+            self.get_logger().info("No markers detected")
         else:
             closest_marker = min(detect_data, key=lambda x: x[3])
-            self.get_logger().debug(f"Closest Marker ID: {closest_marker[0]}, Distance: {closest_marker[3]:.2f}m")
+            self.get_logger().info(f"Closest Marker ID: {closest_marker[0]}, Distance: {closest_marker[3]:.2f}m")
 
             marker_array_msg = MarkerArray()
             for marker in detect_data:
@@ -118,6 +118,7 @@ class ArucoMarkerDetector(Node):
                 marker_msg.pose.pose.orientation.z = marker[2][0]
                 marker_array_msg.markers.append(marker_msg)
             self.marker_publisher.publish(marker_array_msg)
+
         self.publish_img(frame)
         # cv2.imshow('Detected Markers', frame)
         # cv2.waitKey(1)
