@@ -174,6 +174,37 @@ def main(args=None):
             print(f"No. {key_value}")
             rclpy.spin_once(node)
 
+        elif key_value == '0':
+            print(f"No. {key_value}")
+
+            # 1️⃣ 물건 있는 위치로 이동
+            point.positions = [0.0, -0.058, -0.258, 1.94]
+            print("Move to object:", point.positions)
+            trajectory_msg.points = [point]
+            joint_pub.publish(trajectory_msg)
+            rclpy.spin_once(node)  # 한 번 기다리기 (완료 보장용)
+
+            # 2️⃣ 왼쪽으로 90도 회전 (joint1)
+            point.positions[0] = 1.57  # 약 90도 (rad)
+            print("Rotate 90 deg left:", point.positions)
+            joint_pub.publish(trajectory_msg)
+            rclpy.spin_once(node)
+
+            # 3️⃣ 물건 놓는 위치로 팔 이동
+            point.positions = [1.57, -1.052, 1.106, 0.029]
+            print("Move to place location:", point.positions)
+            trajectory_msg.points = [point]
+            joint_pub.publish(trajectory_msg)
+            rclpy.spin_once(node)
+
+            # 4️⃣ 원래 위치로 복귀
+            point.positions = [0.0, -1.052, 1.106, 0.029]
+            print("Return to home:", point.positions)
+            trajectory_msg.points = [point]
+            joint_pub.publish(trajectory_msg)
+            rclpy.spin_once(node)
+
+
         elif key_value == 'q':
             print(f"No. {key_value}")
             break
