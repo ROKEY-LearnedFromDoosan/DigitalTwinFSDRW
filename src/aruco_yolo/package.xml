@@ -12,6 +12,7 @@
   <depend>sensor_msgs</depend>
   <depend>std_msgs</depend>
   <depend>aruco_msgs</depend>
+  <depend>aruco_dist_msg</depend>
 
   <test_depend>ament_copyright</test_depend>
   <test_depend>ament_flake8</test_depend>

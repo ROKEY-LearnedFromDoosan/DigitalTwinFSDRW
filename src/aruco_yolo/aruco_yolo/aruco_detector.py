@@ -10,6 +10,7 @@ from rclpy.node import Node
 from sensor_msgs.msg import CompressedImage
 from std_msgs.msg import Float32, Int32
 from aruco_msgs.msg import Marker, MarkerArray
+from aruco_dist_msg.msg import ArucoDistance
 from cv_bridge import CvBridge
 import time
 
@@ -82,6 +83,7 @@ class ArucoMarkerDetector(Node):
             10)
 
         self.marker_publisher = self.create_publisher(MarkerArray, 'detected_markers', 10)
+        self.marker_distance_publisher = self.create_publisher(ArucoDistance, 'detected_marker_distance', 10)
         self.img_publisher = self.create_publisher(CompressedImage, 'aruco/compressed', 1)
         
         self.bridge = CvBridge()
@@ -90,7 +92,6 @@ class ArucoMarkerDetector(Node):
         self.last_pub_time = time.time()
         # self.camera_matrix  = []
         # self.dist_coeffs = []
-
     def listener_callback(self, msg):
         np_arr = np.frombuffer(msg.data, np.uint8)
         frame = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
@@ -106,7 +107,39 @@ class ArucoMarkerDetector(Node):
             closest_marker = min(detect_data, key=lambda x: x[3])
             self.get_logger().info(f"Closest Marker ID: {closest_marker[0]}, Distance: {closest_marker[3]:.2f}m")
 
+            marker_array_msg = ArucoDistance()
+            id_list = []
+            distance_list = []
+            for marker in detect_data:
+                marker_array_msg.id.append(int(marker[0]))
+                marker_array_msg.distance.append(marker[3])
+
+                # marker_array_msg.markers.append(marker_msg)
+                # marker_dist_array_msg.append(marker_dist_msg)
+            # self.marker_publisher.publish(marker_array_msg)
+            self.marker_distance_publisher.publish(marker_array_msg)
+            print(marker_array_msg)
+
+        self.publish_img(frame)
+        # cv2.imshow('Detected Markers', frame)
+        # cv2.waitKey(1)
+    def listener_callback_org(self, msg):
+        np_arr = np.frombuffer(msg.data, np.uint8)
+        frame = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
+        
+        # width, height, channels = frame.shape
+        # self.camera_matrix  = np.array([[360, 0, width/2], [0, 360, height/2], [0, 0, 1]])
+        # self.dist_coeffs =  np.array([[0, 0, 0, 0, 0]])
+        
+        frame, detect_data = detect_markers(frame, self.camera_matrix, self.dist_coeffs, self.marker_size)
+        if len(detect_data) == 0:
+            self.get_logger().info("No markers detected")
+        else:
+            closest_marker = min(detect_data, key=lambda x: x[3])
+            self.get_logger().info(f"Closest Marker ID: {closest_marker[0]}, Distance: {closest_marker[3]:.2f}m")
+
             marker_array_msg = MarkerArray()
+            marker_dist_array_msg = Float32MultiArray()
             for marker in detect_data:
                 marker_msg = Marker()
                 marker_msg.id = int(marker[0])
@@ -116,8 +149,14 @@ class ArucoMarkerDetector(Node):
                 marker_msg.pose.pose.orientation.x = marker[2][2]
                 marker_msg.pose.pose.orientation.y = marker[2][1]
                 marker_msg.pose.pose.orientation.z = marker[2][0]
+
+                marker_dist_msg = Float32()
+                marker_dist_msg = marker[3]
+
                 marker_array_msg.markers.append(marker_msg)
+                # marker_dist_array_msg.append(marker_dist_msg)
             self.marker_publisher.publish(marker_array_msg)
+            self.marker_distance_publisher.publish(marker_dist_array_msg)
 
         self.publish_img(frame)
         # cv2.imshow('Detected Markers', frame)
